@@ -1,5 +1,6 @@
 import React from 'react'
 import { LogIn, User, Telescope, Search, Flame, Timer, Brain, Wifi } from 'lucide-react'
+import Link from 'next/link'
 
 export default function Header() {
     return (
@@ -7,7 +8,6 @@ export default function Header() {
             <header class="c307p cvtc3 c0ayg">
                 <div class="cbl28 c0g2c coaq6 cb0ik">
                     <div class="chip0 cglp6 c4mnq cd10w cdoit fexample">
-
                         <div class="cosxg cveoo">
                             <a class="cprq6" href="index.html" aria-label="Cruip">
                                 <svg class="cxofs cnujf" viewBox="0 0 32 32">
@@ -45,16 +45,16 @@ export default function Header() {
 
                             <ul class="chip0 cxgjn cutr6 c4mnq cbv5p">
                                 <li className='c8h5l'>
-                                    <a class="sm:!px-4 !px-2 chip0 c4mnq c5mpl chs2t cazq3 ckdyj cdm1x c6m7s ckwz7 cysah cua40 make-btn"
-                                        href="#">
+                                    <Link class="sm:!px-4 !px-2 chip0 c4mnq c5mpl chs2t cazq3 ckdyj cdm1x c6m7s ckwz7 cysah cua40 make-btn"
+                                        href="/register">
                                         <p className='txt-margin !text-[11.1px] sm:!text-[18px] '> ساخت اکانت  </p>
                                         <User />
-                                    </a>
+                                    </Link>
                                 </li>
                                 <li class="c8h5l flex items-center">
-                                    <a class="sm:!px-4 !px-2 !text-[11.2px] sm:!text-[18px] c2pi2 c0ayg c4wey cl6ef cf4pm cqbpd cxmkl c4aul c76qn" href="#">
+                                    <Link class="sm:!px-4 !px-2 !text-[11.2px] sm:!text-[18px] c2pi2 c0ayg c4wey cl6ef cf4pm cqbpd cxmkl c4aul c76qn" href="login">
                                         ورود به اکانت <span class="cfe40 cr1tk c56im cv73b c6m7s ckwz7 ccx8x"><LogIn /></span>
-                                    </a>
+                                    </Link>
                                 </li>
                             </ul>
 
