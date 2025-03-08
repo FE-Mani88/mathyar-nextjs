@@ -1,9 +1,70 @@
 import React, { useState } from 'react';
-import { User, Mail, Lock, Eye, EyeOff } from 'lucide-react';
+import { User, Mail, Lock, Eye, EyeOff, Cookie } from 'lucide-react';
+import loginValidator from '@/validations/login';
+import { useRouter } from 'next/router';
+import Cookies from 'js-cookie';
 import Link from 'next/link';
 
 function Login() {
     const [showPassword, setShowPassword] = useState(false);
+    const [validateErrors, setValidateErrors] = useState(null)
+    const router = useRouter()
+    
+    if (Cookies.get('user')) {
+        // console.log('Hi');
+        router.push('/dashboard')
+    }
+
+    const submitHandler = async (event) => {
+        event.preventDefault()
+
+        const loginUser = {
+            email: event.target[0].value,
+            password: event.target[1].value
+        }
+
+        try {
+            const isValid = await loginValidator.validate(loginUser, {
+                abortEarly: false
+            })
+
+            const res = await fetch('/api/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    email: event.target[0].value,
+                    password: event.target[1].value
+                })
+            })
+
+            const data = await res.json()
+            console.log(data);
+
+
+            if (res.ok) {
+                Cookies.set('user', JSON.stringify(data), { expires: 7 })
+                router.push('/dashboard')
+            }
+
+            // if (res.ok) {
+
+            // }
+
+        } catch (err) {
+            let errors = err?.inner?.reduce(
+                (acc, err) => ({
+                    ...acc,
+                    [err.path]: err.message,
+                }),
+                {}
+            );
+            setValidateErrors(errors);
+            console.log(validateErrors);
+
+        }
+    }
 
     return (
         <div className="cnplf min-h-screen bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-gray-900 via-blue-900 to-gray-900 !flex items-center justify-center !p-6">
@@ -18,53 +79,44 @@ function Login() {
                     <p className="!text-gray-400 !text-lg !mt-1">به حساب کاربری خود وارد شوید</p>
                 </div>
 
-                <form className="space-y-5">
-                    {/* <div className="relative group">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <User className="h-5 w-5 text-gray-500 group-focus-within:text-blue-400 transition-colors duration-200" />
-            </div>
-            <input
-              type="text"
-              name="name"
-              placeholder="Full Name"
-              className="block w-full !pl-10 !pr-3 !py-3.5 !bg-gray-700/50 border !border-gray-600 !rounded-xl focus:!outline-none focus:!ring-2 focus:!ring-blue-500 focus:!border-transparent !text-white !placeholder-gray-400 transition-all duration-200 hover:!bg-gray-700/70"
-              required
-            />
-          </div> */}
-
+                <form className="space-y-5" onSubmit={submitHandler}>
                     <div className="relative group">
                         <div className="absolute !inset-y-0 !left-0 !pl-3 flex items-center pointer-events-none">
-                            <Mail className="h-5 w-5 text-gray-500 group-focus-within:text-blue-400 transition-colors duration-200" />
+                            <Mail className={`relative bottom-1 h-5 w-5 text-gray-500 group-focus-within:text-blue-400 transition-colors duration-200 ${validateErrors?.email ? 'relative sm:bottom-[18px] bottom-5' : null}`} />
                         </div>
                         <input
-                            type="email"
+                            // type="email"
                             name="email"
                             placeholder="آدرس ایمیل"
                             className="!placeholder-gray-400 block w-full !pl-10 !pr-3 !py-3.5 !bg-gray-700/50 border !border-gray-600 !rounded-xl focus:!outline-none focus:!ring-2 focus:!ring-blue-500 focus:!border-transparent !text-white placeholder-gray-400 transition-all duration-200 hover:!bg-gray-700/70"
-                            required
                         />
+                        <p className='text-[15px] sm:text-[17px] text-red-400 text-center pt-3'>
+                            {validateErrors?.email ? validateErrors.email : null}
+                        </p>
                     </div>
 
                     <div className="relative group">
                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <Lock className="h-5 w-5 text-gray-500 group-focus-within:text-blue-400 transition-colors duration-200" />
+                            <Lock className={`relative bottom-1 h-5 w-5 text-gray-500 group-focus-within:text-blue-400 transition-colors duration-200 ${validateErrors?.password ? 'relative sm:bottom-4 bottom-7' : null}`} />
                         </div>
                         <input
                             type={showPassword ? "text" : "password"}
                             name="password"
                             placeholder="رمز عبور"
                             className="block w-full !pl-10 !pr-12 !py-3.5 !bg-gray-700/50 border !border-gray-600 !rounded-xl focus:!outline-none focus:!ring-2 focus:!ring-blue-500 focus:!border-transparent !text-white !placeholder-gray-400 !transition-all duration-200 hover:bg-gray-700/70"
-                            required
                         />
+                        <p className='text-[15px] sm:text-[17px] text-red-400 text-center pt-3'>
+                            {validateErrors?.password ? validateErrors.password : null}
+                        </p>
                         <button
                             type="button"
                             onClick={() => setShowPassword(!showPassword)}
-                            className="absolute inset-y-0 right-0 !pr-3 flex items-center"
+                            className="absolute inset-y-0 right-0 !pr-3 flex bottom-2 items-center"
                         >
                             {showPassword ? (
-                                <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-300 transition-colors cursor-pointer" />
+                                <EyeOff className={`h-5 w-5 text-gray-400 hover:text-gray-300 transition-colors cursor-pointer ${validateErrors?.password ? 'relative sm:bottom-4 bottom-[20px]' : null}`} />
                             ) : (
-                                <Eye className="h-5 w-5 text-gray-400 hover:text-gray-300 transition-colors cursor-pointer" />
+                                <Eye className={`h-5 w-5 text-gray-400 hover:text-gray-300 transition-colors cursor-pointer ${validateErrors?.password ? 'relative sm:bottom-4 bottom-7' : null}`} />
                             )}
                         </button>
                     </div>
@@ -79,9 +131,7 @@ function Login() {
 
                 <div className="text-center">
                     <p className="text-gray-400 flex justify-center gap-1 rtl">
-                        <p className='text-[14px] sm:!text-[16px]'>
-                            حساب کاربری ندارید؟
-                        </p>
+                        حساب کاربری ندارید؟
                         <Link href="register" className="!text-blue-400 hover:!text-blue-300 font-semibold transition-colors duration-200 !text-sm sm:!text-md">
                             ثبت نام کنید
                         </Link>

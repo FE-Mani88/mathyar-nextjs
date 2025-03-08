@@ -538,7 +538,7 @@
             "description": "سوالات این بخش شامل مباحث با سطح متوسط است و سوالات معتبر از منابع مختلف به بهبود سطح ریاضی شما کمک میکند",
             "duration": 10,
             "totalQuestions": 5,
-            "image": "https://images.prismic.io/prodigy-website/3b23b533-c408-4380-bce6-0820b89131e9_math-on-board.jpeg?auto=compress%2Cformat&rect=0%2C874%2C6048%2C2016&w=1920&h=640&fit=max",
+            "image": "https://news.mit.edu/sites/default/files/images/202208/MIT-MathProblemSolver-01-press.jpg",
             "topics": [
                 "دایره ها",
                 "هندسه",
@@ -604,6 +604,21 @@
                 "استدلال و اثبات",
                 "مجموعه ها"
             ]
+        }
+    ],
+    "users": [
+        {
+            "id": "d8c63b34-e936-434e-9f4c-8febe95aa9ca",
+            "name": "effe",
+            "email": "khm750298@gmail.com",
+            "password": "mani1388",
+            "isAdmin": false
+        },
+        {
+            "id": "47-ILIYA-4747-abbasi-22",
+            "name": "Iliya",
+            "email": "",
+            "isAdmin": true
         }
     ]
 }

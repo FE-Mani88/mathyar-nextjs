@@ -2461,3 +2461,8 @@ input[type=range]::-moz-focus-outer {
 .ltr {
   direction: ltr;
 }
+
+.testClass {
+  position: relative;
+  bottom: 8px;
+}

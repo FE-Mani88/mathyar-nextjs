@@ -1,10 +1,75 @@
 import React, { useState } from 'react';
+import { useRouter } from 'next/router';
 import { User, Mail, Lock, Eye, EyeOff } from 'lucide-react';
+import registerValidator from '@/validations/register';
+import Cookies from 'js-cookie';
 import Link from 'next/link';
+
 
 function Register() {
   const [showPassword, setShowPassword] = useState(false);
+  const [allErrors, setAllErrors] = useState(null)
+  const router = useRouter()
 
+  if (Cookies.get('user')) {
+    // console.log('Hi');
+    router.push('/dashboard')
+  }
+
+  const submitHandler = async (event) => {
+    event.preventDefault()
+    //////////////////////
+    const newUser = {
+      name: event.target[0].value,
+      email: event.target[1].value,
+      password: event.target[2].value
+    }
+
+    try {
+      const isValid = await registerValidator.validate(newUser, {
+        abortEarly: false
+      })
+
+      // console.log(isValid)
+      const res = await fetch('/api/users', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          name: event.target[0].value,
+          email: event.target[1].value,
+          password: event.target[2].value
+        })
+      })
+
+      if (res.ok) {
+        // console.log('REG');
+
+        event.target[0].value = ''
+        event.target[1].value = ''
+        event.target[2].value = ''
+        // console.log(await res.json());
+        const data = await res.json()
+        Cookies.set('user', JSON.stringify(data), { expires: 7 })
+        // console.log(JSON.parse(Cookies.get('user')));
+
+        router.push('/dashboard')
+      }
+
+    } catch (err) {
+      let errors = err.inner.reduce(
+        (acc, err) => ({
+          ...acc,
+          [err.path]: err.message,
+        }),
+        {}
+      );
+      setAllErrors(errors);
+      // console.log(errors);
+    }
+
+  }
 
   return (
     <div className="cnplf min-h-screen bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-gray-900 via-blue-900 to-gray-900 !flex items-center justify-center !p-6">
@@ -15,57 +80,64 @@ function Register() {
         <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500"></div>
 
         <div className="text-center space-y-2">
-          <h1 className="!text-4xl !font-bold !bg-gradient-to-r from-blue-400 to-indigo-400 !bg-clip-text !text-transparent">ساخت حساب کاربری</h1>
+          <h1 className="!text-2xl sm:!text-4xl !font-semibold sm:!font-bold !bg-gradient-to-r from-blue-400 to-indigo-400 !bg-clip-text !text-transparent">ساخت حساب کاربری</h1>
           <p className="!text-gray-400 !text-lg mt-1">به جمع ما بپیوندید</p>
         </div>
 
-        <form className="space-y-5">
+        <form className="space-y-5" onSubmit={submitHandler}>
           <div className="relative group">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <User className="h-5 w-5 text-gray-500 group-focus-within:text-blue-400 transition-colors duration-200" />
+              <User className={`relative bottom-1 h-5 w-5 text-gray-500 group-focus-within:text-blue-400 transition-colors duration-200 ${allErrors?.name ? 'relative sm:bottom-4 bottom-4' : null}`} />
             </div>
             <input
               type="text"
               name="name"
               placeholder="نام کاربری"
               className="block w-full !pl-10 !pr-3 !py-3.5 !bg-gray-700/50 border !border-gray-600 !rounded-xl focus:!outline-none focus:!ring-2 focus:!ring-blue-500 focus:!border-transparent !text-white !placeholder-gray-400 transition-all duration-200 hover:!bg-gray-700/70"
-              required
             />
+            {/* <p className=''>{allErrors?.name ? allErrors?.name : null}</p> */}
+            <p className='text-[15px] sm:text-[17px] text-red-400 text-center pt-3'>
+              {allErrors?.name ? allErrors?.name : null}
+            </p>
           </div>
 
           <div className="relative group">
             <div className="absolute !inset-y-0 !left-0 !pl-3 flex items-center pointer-events-none">
-              <Mail className="h-5 w-5 text-gray-500 group-focus-within:text-blue-400 transition-colors duration-200" />
+              <Mail className={`relative bottom-1 h-5 w-5 text-gray-500 group-focus-within:text-blue-400 transition-colors duration-200 ${allErrors?.email ? 'relative sm:bottom-5 bottom-3' : null}`} />
             </div>
             <input
-              type="email"
+              // type="email"
               name="email"
               placeholder="آدرس ایمیل"
               className="!placeholder-gray-400 block w-full !pl-10 !pr-3 !py-3.5 !bg-gray-700/50 border !border-gray-600 !rounded-xl focus:!outline-none focus:!ring-2 focus:!ring-blue-500 focus:!border-transparent !text-white placeholder-gray-400 transition-all duration-200 hover:!bg-gray-700/70"
-              required
             />
+            <p className='text-[15px] sm:text-[17px] text-red-400 text-center pt-3'>
+              {allErrors?.email ? allErrors?.email : null}
+            </p>
           </div>
 
           <div className="relative group">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <Lock className="h-5 w-5 text-gray-500 group-focus-within:text-blue-400 transition-colors duration-200" />
+              <Lock className={`relative bottom-1 h-5 w-5 text-gray-500 group-focus-within:text-blue-400 transition-colors duration-200 ${allErrors?.password ? 'relative sm:bottom-4 bottom-7' : null}`} />
             </div>
             <input
               type={showPassword ? "text" : "password"}
               name="password"
               placeholder="گذرواژه"
-              className="block w-full !pl-10 !pr-12 !py-3.5 !bg-gray-700/50 border !border-gray-600 !rounded-xl focus:!outline-none focus:!ring-2 focus:!ring-blue-500 focus:!border-transparent !text-white !placeholder-gray-400 !transition-all duration-200 hover:bg-gray-700/70"
-              required
+              className={`block w-full !pl-10 !pr-12 !py-3.5 !bg-gray-700/50 border !border-gray-600 !rounded-xl focus:!outline-none focus:!ring-2 focus:!ring-blue-500 focus:!border-transparent !text-white !placeholder-gray-400 !transition-all duration-200 hover:bg-gray-700/70`}
             />
+            <p className='text-[15px] sm:text-[17px] text-red-400 text-center pt-3'>
+              {allErrors?.password ? allErrors?.password : null}
+            </p>
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
               className="absolute inset-y-0 right-0 !pr-3 flex items-center"
             >
               {showPassword ? (
-                <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-300 transition-colors cursor-pointer" />
+                <EyeOff className={`testClass h-5 w-5 text-gray-400 hover:text-gray-300 transition-colors cursor-pointer bottom-2 ${allErrors?.password ? 'relative sm:bottom-5 bottom-[20px]' : null}`} />
               ) : (
-                <Eye className="h-5 w-5 text-gray-400 hover:text-gray-300 transition-colors cursor-pointer" />
+                <Eye className={`testClass h-5 w-5 text-gray-400 hover:text-gray-300 transition-colors cursor-pointer bottom-2 ${allErrors?.password ? 'relative sm:bottom-5 bottom-7' : null}`} />
               )}
             </button>
           </div>

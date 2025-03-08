@@ -157,7 +157,7 @@ export default function Main() {
                                                 </svg>
                                                 <span>طراحی مناسب سوالات</span>
                                             </li>
-                                            <li className="chip0 c4mnq flex gap-2">
+                                            <li className="chip0 c4mnq flex gap-2 !text-[17.7px]">
                                                 <svg className="cejbf c8u3n cn0vf cveoo c6f9y cmb3e" viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg">
                                                     <path d="M10.28 2.28L3.989 8.575 1.695 6.28A1 1 0 00.28 7.695l3 3a1 1 0 001.414 0l7-7A1 1 0 0010.28 2.28z">
                                                     </path>
