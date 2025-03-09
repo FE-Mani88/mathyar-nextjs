@@ -25,6 +25,6 @@ export default function Users(req, res) {
         fs.writeFileSync(dbDirectory, JSON.stringify(data))
         res.status(201).json(newUser)
     } else if (req.method === 'GET') {
-        
+        res.json(data.users)
     }
 }

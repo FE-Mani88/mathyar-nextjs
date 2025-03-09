@@ -608,17 +608,49 @@
     ],
     "users": [
         {
-            "id": "d8c63b34-e936-434e-9f4c-8febe95aa9ca",
-            "name": "effe",
-            "email": "khm750298@gmail.com",
-            "password": "mani1388",
+            "id": "0882b813-5939-444c-80f5-4701659ec3db",
+            "name": "ILIYA88",
+            "email": "Mbazad.8432@gmail.com",
+            "password": "0750254440",
+            "isAdmin": true
+        },
+        {
+            "id": "442ebf43-7989-43a1-8c86-9c0f63070576",
+            "name": "Javad",
+            "email": "kingmagamer@gmail.com",
+            "password": "javad8822",
+            "isAdmin": true
+        },
+        {
+            "id": "9a8bf0c8-cb2c-4790-9ab7-22f9bb31037b",
+            "name": "malakh15",
+            "email": "amirsalarhossainzadeh@gmail.com",
+            "password": "amirhh15",
             "isAdmin": false
         },
         {
-            "id": "47-ILIYA-4747-abbasi-22",
-            "name": "Iliya",
-            "email": "",
-            "isAdmin": true
+            "id": "eec95b6f-80cb-499c-a14a-ffa6222a6515",
+            "name": "Dev Mani",
+            "email": "khm750298@gmail.com",
+            "password": "mani1388"
+        },
+        {
+            "id": "9829e8b4-02e1-4e8a-b058-ac7304b72448",
+            "name": "Iman52",
+            "email": "imanshirdel.89@gmail.com",
+            "password": "iman0068"
+        },
+        {
+            "id": "361f2437-1491-46b7-96b2-1d734399fa2e",
+            "name": "Pooya",
+            "email": "pooyarahimi2011@gmail.com",
+            "password": "pooya88T"
+        },
+        {
+            "id": "02389add-8498-4f08-9abb-28af40411d3f",
+            "name": "Rezai",
+            "email": "vortexamir.r.r1389@gmail.com",
+            "password": "12345678"
         }
     ]
 }
