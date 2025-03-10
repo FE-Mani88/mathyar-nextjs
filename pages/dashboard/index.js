@@ -246,7 +246,7 @@ const UsersContent = ({ users }) => {
                         </tbody>
                     </table>
                 </div>
-                    {!filteredUsers.length ? <span className='flex justify-center mt-4 py-3 rounded-lg !bg-none text-xl'>User not found !</span> : null}
+                {!filteredUsers.length ? <span className='flex justify-center mt-4 py-3 rounded-lg !bg-none text-xl'>User not found !</span> : null}
             </div>
         </>
     )
@@ -255,7 +255,7 @@ const UsersContent = ({ users }) => {
 const ProductsContent = ({ quizzes }) => {
 
     const [searchQuery, setSearchQuery] = useState('')
-
+    const [fixed, setFixed] = useState(null)
     const filteredQuizzes = quizzes?.filter(quiz => {
         return quiz.title.includes(searchQuery)
     })
