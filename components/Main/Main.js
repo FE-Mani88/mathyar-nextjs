@@ -1,7 +1,7 @@
 import React from 'react'
 // import { Link } from 'react-router-dom'
 import Link from 'next/link';
-import Typewriter from 'typewriter-effect';
+// import Typewriter from 'typewriter-effect';
 import { LogIn, User, Telescope, Search, Flame, Timer, Brain, Wifi } from 'lucide-react'
 
 export default function Main() {
@@ -126,13 +126,13 @@ export default function Main() {
                             {/* Section header */}
                             <div className="cbl28 cqg01 czfa1 ckxd8 c2e3f">
                                 <h2 className="c4cmz cvx4v cejd3">
-                                    <Typewriter
+                                    {/* <Typewriter
                                         options={{
                                             strings: 'MathYar - پلتفرم آموزش ریاضی',
                                             autoStart: true,
                                             loop: true,
                                         }}
-                                    />
+                                    /> */}
                                 </h2>
                                 <div className="cbl28 cms5w">
                                     <p className="cbqc4 ckdyj">
