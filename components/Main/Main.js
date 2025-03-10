@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { LogIn, User, Telescope, Search, Flame, Timer, Brain, Wifi } from 'lucide-react'
 
 export default function Main() {
+    const test = 1
     return (
         <>
             <main className="cxgjn">
