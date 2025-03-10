@@ -50,7 +50,7 @@ const Sidebar = ({ isOpen, onClose, activeItem, setActiveItem }) => (
         {/* Mobile overlay */}
         {isOpen && (
             <div
-                className="md:hidden fixed inset-0 bg-black bg-opacity-50 z-20"
+                className="md:!hidden fixed inset-0 bg-black bg-opacity-50 z-20"
                 onClick={onClose}
             />
         )}
@@ -58,10 +58,10 @@ const Sidebar = ({ isOpen, onClose, activeItem, setActiveItem }) => (
         {/* Sidebar */}
         <div className={`
       fixed inset-y-0 left-0 
-      transform ${isOpen ? 'translate-x-0' : '-translate-x-full'} 
-      md:translate-x-0 transition-transform duration-200 ease-in-out
-      flex flex-col w-64 bg-gray-900 text-white z-30
-      overflow-hidden
+      transform ${isOpen ? '!translate-x-0' : '!hidden w-full sm:!flex !-translate-x-full'} 
+      md:!translate-x-0 transition-transform !duration-200 ease-in-out
+      flex flex-col !w-64 bg-gray-900 text-white !z-30
+      !overflow-hidden
     `}>
             <div className="flex-shrink-0 p-6">
                 <div className="flex items-center justify-between mb-8">
@@ -254,7 +254,7 @@ const UsersContent = ({ users }) => {
     )
 };
 
-const ProductsContent = ({quizzes}) => {
+const ProductsContent = ({ quizzes }) => {
 
     const [searchQuery, setSearchQuery] = useState('')
     const [fixed, setFixed] = useState(null)
@@ -410,7 +410,7 @@ const SettingsContent = () => (
     </>
 );
 
-function App({data}) {
+function App({ data }) {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [activeItem, setActiveItem] = useState('dashboard');
@@ -436,7 +436,7 @@ function App({data}) {
         // }
 
         // fetchHandler()
-console.log('App: ', data.quizzesData.quizzes);
+        console.log('App: ', data.quizzesData.quizzes);
 
         const getfromCookie = () => {
             const pureData = Cookies.get('user')
