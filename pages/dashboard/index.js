@@ -256,7 +256,7 @@ const ProductsContent = ({ quizzes }) => {
 
     const [searchQuery, setSearchQuery] = useState('')
 
-    const filteredQuizzes = quizzes.filter(quiz => {
+    const filteredQuizzes = quizzes?.filter(quiz => {
         return quiz.title.includes(searchQuery)
     })
 
