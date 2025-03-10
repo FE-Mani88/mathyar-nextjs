@@ -297,7 +297,7 @@ const ProductsContent = ({ quizzes }) => {
             </div>
             {/* end search box */}
             <div className="flex flex-col gap-2">
-                {filteredQuizzes.map(quiz => (
+                {/* {filteredQuizzes.map(quiz => (
                     <div className='px-3 py-3 text-white bg-[#2a3443] rounded-lg'>
                         <p className='gap-[2px] cxykh c0ayg c4wey cl6ef cf4pm cqbpd cxmkl c4aul c76qn'>{quiz.title}</p>
                         <p className='!mt-4'>Grade: {quiz.grade}</p>
@@ -310,7 +310,7 @@ const ProductsContent = ({ quizzes }) => {
                             <li>{quiz.topics[2]}</li>
                         </ul>
                     </div>
-                ))}
+                ))} */}
                 {!filteredQuizzes.length ? <span className='flex mx-auto mt-4'>Quiz Not Found !</span> : null}
             </div>
         </>
