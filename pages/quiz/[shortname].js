@@ -4,25 +4,24 @@ import { useRouter } from 'next/router'
 import { Clock, BookOpen, BarChart, ArrowLeft, GraduationCap, List } from 'lucide-react';
 import { DIFFICULTY_COLORS } from '../../utils/constants';
 import { ActiveQuiz } from '@/components/ActiveQuiz/ActiveQuiz';
+import fs from 'fs'
+import path from 'path';
 
+export default function QuizShortName(props) {
 
-export default function QuizShortName() {
-
-    // const [isQuizFoundGlobal, setIsQuizFoundGlobal] = useState(null)
-
-    // let isQuizFoundGlobal = useRef()
     const router = useRouter()
     const queryValue = router.query
     const [foundQuiz, setFoundQuiz] = useState(null)
     const [isQuizStarted, setIsQuizStarted] = useState(null)
 
+    console.log(props.data.quizzes);
+    
 
     useEffect(() => {
         const fetchHandler = async () => {
-            const res = await fetch('http://localhost:3000/api/quizzes')
-            const quizzesData = await res.json()
+            
 
-            let isQuizFound = quizzesData?.find(quiz => quiz.id == queryValue.shortname)
+            let isQuizFound = props.data.quizzes?.find(quiz => quiz.id == queryValue.shortname)
             // console.log(()isQuizFound);
 
             if (isQuizFound?.id != foundQuiz?.id) {
@@ -136,4 +135,19 @@ export default function QuizShortName() {
             </div>
         </>
     )
+}
+
+
+export async function getServerSideProps(params) {
+
+    const databaseDirectory = path.join(process.cwd(), 'data', 'db.json')
+
+    const bufferData = fs.readFileSync(databaseDirectory)
+    const data = JSON.parse(bufferData)
+
+    return {
+        props: {
+            data: data
+        }
+    }
 }
