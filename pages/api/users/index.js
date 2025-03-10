@@ -26,5 +26,7 @@ export default function Users(req, res) {
         res.status(201).json(newUser)
     } else if (req.method === 'GET') {
         res.json(data.users)
+    } else {
+        res.status(300).json('String')
     }
 }
