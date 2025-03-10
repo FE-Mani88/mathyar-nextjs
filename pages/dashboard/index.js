@@ -21,6 +21,8 @@ import {
     Key
 } from 'lucide-react';
 import Cookies from 'js-cookie';
+import fs from 'fs'
+import path from 'path';
 
 
 const NavItem = ({ icon: Icon, text, isActive, onClick }) => (
@@ -252,7 +254,7 @@ const UsersContent = ({ users }) => {
     )
 };
 
-const ProductsContent = ({ quizzes }) => {
+const ProductsContent = ({quizzes}) => {
 
     const [searchQuery, setSearchQuery] = useState('')
     const [fixed, setFixed] = useState(null)
@@ -260,7 +262,7 @@ const ProductsContent = ({ quizzes }) => {
         return quiz.title.includes(searchQuery)
     })
 
-    console.log(filteredQuizzes);
+    console.log('props: ', quizzes);
 
 
     return (
@@ -408,7 +410,7 @@ const SettingsContent = () => (
     </>
 );
 
-function App() {
+function App({data}) {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const [activeItem, setActiveItem] = useState('dashboard');
@@ -426,14 +428,15 @@ function App() {
 
         fetchUsers()
 
-        const fetchHandler = async () => {
-            const res = await fetch('http://localhost:3000/api/quizzes')
-            const quizzesData = await res.json()
-            setQuizzes(quizzesData)
-            // console.log(quizzesData)
-        }
+        // const fetchHandler = async () => {
+        //     const res = await fetch('http://localhost:3000/api/quizzes')
+        //     const quizzesData = await res.json()
+        //     setQuizzes(quizzesData)
+        //     // console.log(quizzesData)
+        // }
 
-        fetchHandler()
+        // fetchHandler()
+console.log('App: ', data.quizzesData.quizzes);
 
         const getfromCookie = () => {
             const pureData = Cookies.get('user')
@@ -453,7 +456,7 @@ function App() {
             case 'users':
                 return <UsersContent users={users} />;
             case 'products':
-                return <ProductsContent quizzes={quizzes} />;
+                return <ProductsContent quizzes={data.quizzesData.quizzes} />;
             case 'messages':
                 return <MessagesContent />;
             case 'settings':
@@ -537,3 +540,21 @@ function App() {
 }
 
 export default App;
+
+
+export async function getServerSideProps(params) {
+    const databaseDirectory = path.join(process.cwd(), 'data', 'db.json')
+    const bufferData = fs.readFileSync(databaseDirectory)
+    const data = JSON.parse(bufferData)
+
+    console.log('//////////////////', data.quizzes);
+
+
+    return {
+        props: {
+            data: {
+                quizzesData: data
+            }
+        }
+    }
+}
