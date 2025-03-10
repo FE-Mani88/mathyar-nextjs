@@ -264,58 +264,58 @@ const ProductsContent = ({ quizzes }) => {
 
 
     return (
-        // <>
-        //     <div className="mb-6 md:mb-8">
-        //         <h1 className="text-xl md:text-2xl font-bold text-gray-800">Quizzes</h1>
-        //         <p className="text-gray-600 mt-1">Manage your quizzes inventory</p>
-        //     </div>
+        <>
+            <div className="mb-6 md:mb-8">
+                <h1 className="text-xl md:text-2xl font-bold text-gray-800">Quizzes</h1>
+                <p className="text-gray-600 mt-1">Manage your quizzes inventory</p>
+            </div>
 
-        //     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-6 md:mb-8">
-        //         <StatCard icon={Package} title="Total Products" value="1,678" trend={8} />
-        //         <StatCard icon={ShoppingCart} title="Orders" value="892" trend={15} />
-        //         <StatCard icon={DollarSign} title="Revenue" value="$45,678" trend={24} />
-        //     </div>
-        //     {/* search box */}
-        //     <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-lg flex items-center p-4">
-        //         <div className="w-full mx-auto">
-        //             <div className="relative group">
-        //                 <div className="absolute inset-0 bg-gradient-to-r from-purple-400 to-pink-400 rounded-xl blur opacity-25 group-hover:opacity-40 transition duration-200"></div>
-        //                 <div className="relative bg-white rounded-xl shadow-xl">
-        //                     <div className="flex items-center p-4 !border-none">
-        //                         {/* <Search className="w-5 h-5 text-gray-400 flex-shrink-0" /> */}
-        //                         <input
-        //                             type="text"
-        //                             value={searchQuery}
-        //                             onChange={(event) => setSearchQuery(event.target.value)}
-        //                             placeholder="Search anything..."
-        //                             className="w-full px-4 py-2 text-gray-700 bg-transparent focus:!border-none focus:!outline-none !outline-none !border-none placeholder-gray-400"
-        //                         />
-        //                     </div>
-        //                 </div>
-        //             </div>
-        //         </div>
-        //     </div>
-        //     {/* end search box */}
-        //     <div className="flex flex-col gap-2">
-        //         {/* {filteredQuizzes.map(quiz => (
-        //             <div className='px-3 py-3 text-white bg-[#2a3443] rounded-lg'>
-        //                 <p className='gap-[2px] cxykh c0ayg c4wey cl6ef cf4pm cqbpd cxmkl c4aul c76qn'>{quiz.title}</p>
-        //                 <p className='!mt-4'>Grade: {quiz.grade}</p>
-        //                 <p>Difficultly: {quiz.difficulty}</p>
-        //                 <p>Duration: {quiz.duration} Minute(s)</p>
-        //                 <ul className='flex gap-2'>
-        //                     <li>Topics: </li>
-        //                     <li>{quiz.topics[0]},</li>
-        //                     <li>{quiz.topics[1]},</li>
-        //                     <li>{quiz.topics[2]}</li>
-        //                 </ul>
-        //             </div>
-        //         ))} */}
-        //         {!filteredQuizzes.length ? <span className='flex mx-auto mt-4'>Quiz Not Found !</span> : null}
-        //     </div>
-        // </>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-6 md:mb-8">
+                <StatCard icon={Package} title="Total Products" value="1,678" trend={8} />
+                <StatCard icon={ShoppingCart} title="Orders" value="892" trend={15} />
+                <StatCard icon={DollarSign} title="Revenue" value="$45,678" trend={24} />
+            </div>
+            {/* search box */}
+            <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-lg flex items-center p-4">
+                <div className="w-full mx-auto">
+                    <div className="relative group">
+                        <div className="absolute inset-0 bg-gradient-to-r from-purple-400 to-pink-400 rounded-xl blur opacity-25 group-hover:opacity-40 transition duration-200"></div>
+                        <div className="relative bg-white rounded-xl shadow-xl">
+                            <div className="flex items-center p-4 !border-none">
+                                {/* <Search className="w-5 h-5 text-gray-400 flex-shrink-0" /> */}
+                                <input
+                                    type="text"
+                                    value={searchQuery}
+                                    onChange={(event) => setSearchQuery(event.target.value)}
+                                    placeholder="Search anything..."
+                                    className="w-full px-4 py-2 text-gray-700 bg-transparent focus:!border-none focus:!outline-none !outline-none !border-none placeholder-gray-400"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {/* end search box */}
+            <div className="flex flex-col gap-2">
+                {filteredQuizzes?.map(quiz => (
+                    <div className='px-3 py-3 text-white bg-[#2a3443] rounded-lg'>
+                        <p className='gap-[2px] cxykh c0ayg c4wey cl6ef cf4pm cqbpd cxmkl c4aul c76qn'>{quiz.title}</p>
+                        <p className='!mt-4'>Grade: {quiz.grade}</p>
+                        <p>Difficultly: {quiz.difficulty}</p>
+                        <p>Duration: {quiz.duration} Minute(s)</p>
+                        <ul className='flex gap-2'>
+                            <li>Topics: </li>
+                            <li>{quiz.topics[0]},</li>
+                            <li>{quiz.topics[1]},</li>
+                            <li>{quiz.topics[2]}</li>
+                        </ul>
+                    </div>
+                ))}
+                {!filteredQuizzes?.length ? <span className='flex mx-auto mt-4'>Quiz Not Found !</span> : null}
+            </div>
+        </>
 
-        <div>Hi</div>
+        // <div>Hi</div>
     )
 }
 
