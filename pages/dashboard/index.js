@@ -214,7 +214,7 @@ const UsersContent = ({ users }) => {
                         </thead>
                         <tbody className="bg-white divide-y divide-gray-200">
                             {filteredUsers?.map((user) => (
-                                <tr>
+                                <tr className='!w-full !min-w-100px'>
                                     <td className="px-4 py-4 whitespace-nowrap">
                                         <div className="flex items-center">
                                             <div className="ml-4">

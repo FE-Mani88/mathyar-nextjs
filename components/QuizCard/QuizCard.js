@@ -33,7 +33,7 @@ export default function QuizCard({ id, title, description, difficulty, duration,
         <>
             {/* <ThemeToggle isDark={isDark} onToggle={() => setIsDark(!isDark)} /> */}
             <Link href={`/quiz/${id}`} className="block transform translate-y-[100px] transition-all !duration-300">
-                <motion.div initial="hidden" // شروع با حالت پنهان
+                <div initial="hidden" // شروع با حالت پنهان
                     animate="visible" // انیمیشن به حالت قابل مشاهده
                     variants={variants} // تعیین حالت‌ها
                     transition={{ duration: 0.5 }} className="bg-white dark:bg-[#293546] rounded-xl shadow-lg overflow-hidden"
@@ -72,7 +72,7 @@ export default function QuizCard({ id, title, description, difficulty, duration,
                             </div>
                         </div>
                     </div>
-                </motion.div>
+                </div>
             </Link>
         </>
     )

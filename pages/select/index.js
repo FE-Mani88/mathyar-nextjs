@@ -15,7 +15,7 @@ export default function Select(props) {
   const [selectedGrade, setSelectedGrade] = useState(null);
   const [quizzes, setQuizzes] = useState(null)
   const [isSun, setIsSun] = useState(null)
-console.log('props: ', props.data.quizzes.quizzes);
+  console.log('props: ', props.data.quizzes.quizzes);
 
   const themeHandler = () => {
     document.documentElement.classList.toggle('dark')
