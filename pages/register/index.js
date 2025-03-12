@@ -31,7 +31,7 @@ function Register() {
       })
 
       // console.log(isValid)
-      const res = await fetch('/api/users', {
+      const res = await fetch('/api/users/register', {
         
         method: 'POST',
         headers: {
