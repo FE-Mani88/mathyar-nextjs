@@ -663,6 +663,24 @@
             "name": "user",
             "email": "Mbazad.8432@gmail.com",
             "password": "testpass"
+        },
+        {
+            "id": "968efc66-151d-4846-a271-0b162094ff9e",
+            "name": "David",
+            "email": "dav12@gmail.com",
+            "password": "david123"
+        },
+        {
+            "id": "409c1048-1023-4c30-b338-f791666f1c25",
+            "name": "Abbas",
+            "email": "abbas-12@gmail.com",
+            "password": "abbas122"
+        },
+        {
+            "id": "2dcc4ec3-065f-4f9b-bc52-ef432d78df8c",
+            "name": "33e3",
+            "email": "khm750298@gmail.com",
+            "password": "rgrgrgrg"
         }
     ]
 }

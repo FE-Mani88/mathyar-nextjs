@@ -32,6 +32,7 @@ function Register() {
 
       // console.log(isValid)
       const res = await fetch('/api/users', {
+        
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
