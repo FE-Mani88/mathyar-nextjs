@@ -1,5 +1,6 @@
 import fs from 'fs'
 import path from 'path'
+import { v4 as uuidv4 } from 'uuid'
 
 export default function handler(req, res) {
     if (req.method !== 'POST') {
@@ -13,6 +14,11 @@ export default function handler(req, res) {
 
         const { email, password, name } = req.body
 
+        // Validate required fields
+        if (!email || !password || !name) {
+            return res.status(400).json({ message: 'All fields are required' })
+        }
+
         // Check if user already exists
         const existingUser = data.users.find(user => user.email === email)
         if (existingUser) {
@@ -21,7 +27,7 @@ export default function handler(req, res) {
 
         // Create new user
         const newUser = {
-            id: data.users.length + 1,
+            id: uuidv4(),
             name,
             email,
             password,
@@ -30,6 +36,8 @@ export default function handler(req, res) {
 
         // Add user to database
         data.users.push(newUser)
+        
+        // Write to file
         fs.writeFileSync(dbDirectory, JSON.stringify(data, null, 2))
 
         // Return success without password

@@ -32,42 +32,38 @@ function Register() {
 
       // console.log(isValid)
       const res = await fetch('/api/users/register', {
-        
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({
-          name: event.target[0].value,
-          email: event.target[1].value,
-          password: event.target[2].value
-        })
+        body: JSON.stringify(newUser)
       })
 
-      if (res.ok) {
-        // console.log('REG');
+      const data = await res.json()
 
+      if (res.ok) {
         event.target[0].value = ''
         event.target[1].value = ''
         event.target[2].value = ''
-        // console.log(await res.json());
-        const data = await res.json()
         Cookies.set('user', JSON.stringify(data), { expires: 7 })
-        // console.log(JSON.parse(Cookies.get('user')));
-
         router.push('/dashboard')
+      } else {
+        setAllErrors({ api: data.message })
       }
 
     } catch (err) {
-      let errors = err.inner.reduce(
-        (acc, err) => ({
-          ...acc,
-          [err.path]: err.message,
-        }),
-        {}
-      );
-      setAllErrors(errors);
-      // console.log(errors);
+      if (err.inner) {
+        let errors = err.inner.reduce(
+          (acc, err) => ({
+            ...acc,
+            [err.path]: err.message,
+          }),
+          {}
+        );
+        setAllErrors(errors);
+      } else {
+        setAllErrors({ api: 'An error occurred during registration' });
+      }
     }
 
   }
@@ -142,6 +138,12 @@ function Register() {
               )}
             </button>
           </div>
+
+          {allErrors?.api && (
+            <p className='text-[15px] sm:text-[17px] text-red-400 text-center'>
+              {allErrors.api}
+            </p>
+          )}
 
           <button
             type="submit"
