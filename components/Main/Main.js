@@ -127,9 +127,10 @@ export default function Main() {
                             {/* Section header */}
                             <div className="cbl28 cqg01 czfa1 ckxd8 c2e3f">
                                 <h2 className="c4cmz cvx4v cejd3">
+                                پلتفرم آموزش ریاضی
                                     {/* <Typewriter
                                         options={{
-                                            strings: 'MathYar - پلتفرم آموزش ریاضی',
+                                            strings: 'MathYar - ,
                                             autoStart: true,
                                             loop: true,
                                         }}
