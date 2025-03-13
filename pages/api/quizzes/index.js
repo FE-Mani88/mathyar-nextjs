@@ -1,13 +1,13 @@
-import fs from 'fs'
-import path from 'path'
+// import mongoose from "mongoose"
+import connectDB from "@/utils/db"
+import quizzesModel from "@/models/quiz"
 
-export default function Quizzes (req, res) {
-    const databaseDirectory = path.join(process.cwd(), 'data', 'db.json')
-
-    const bufferData = fs.readFileSync(databaseDirectory)
-    const data = JSON.parse(bufferData)
-
+export default async function Quizzes(req, res) {
+    connectDB()
     if (req.method === 'GET') {
-        res.json(data.quizzes)
+        // console.log(quizzesModel.find({}));
+        const quizzes = await quizzesModel.find()
+        
+        res.json(quizzes)
     }
 }

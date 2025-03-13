@@ -5,8 +5,6 @@ import QuizCard from '../../components/QuizCard/QuizCard';
 import ThemeToggle from '@/components/ThemeToggle/ThemeToggle';
 import ThemeButton from '@/components/ThemeButton/ThemeButton';
 import { Moon, Sun } from "lucide-react"
-import fs from 'fs';
-import path from 'path';
 
 
 export default function Select(props) {
@@ -15,7 +13,7 @@ export default function Select(props) {
   const [selectedGrade, setSelectedGrade] = useState(null);
   const [quizzes, setQuizzes] = useState(null)
   const [isSun, setIsSun] = useState(null)
-  console.log('props: ', props.data.quizzes.quizzes);
+  // console.log('props: ', props.data.quizzes.quizzes);
 
   const themeHandler = () => {
     document.documentElement.classList.toggle('dark')
@@ -29,19 +27,19 @@ export default function Select(props) {
   }
 
   useEffect(() => {
-    // const fetchHandler = async () => {
-    //   const res = await fetch('http://localhost:3000/api/quizzes')
-    //   const quizzesData = await res.json()
-    //   setQuizzes(quizzesData)
-    //   // console.log(quizzesData)
-    // }
+    const fetchHandler = async () => {
+      const res = await fetch('http://localhost:3000/api/quizzes')
+      const quizzesData = await res.json()
+      setQuizzes(quizzesData)
+      // console.log(quizzesData)
+    }
 
-    // fetchHandler()
+    fetchHandler()
   }, [])
 
   const filteredQuizzes = selectedGrade
-    ? props.data.quizzes.quizzes.filter(quiz => quiz.grade === selectedGrade)
-    : props.data.quizzes.quizzes;
+    ? quizzes.filter(quiz => quiz.grade === selectedGrade)
+    : quizzes;
 
   return (
     <>
@@ -117,18 +115,16 @@ export default function Select(props) {
 }
 
 
-export async function getServerSideProps(params) {
+// export async function getServerSideProps(params) {
 
-  const databaseDirectory = path.join(process.cwd(), 'data', 'db.json')
+//   const res  = await fetch('/api/quizzes')
+//   const data = await res.json()
 
-  const bufferData = fs.readFileSync(databaseDirectory)
-  const data = JSON.parse(bufferData)
-
-  return {
-    props: {
-      data: {
-        quizzes: data
-      }
-    }
-  }
-}
+//   return {
+//     props: {
+//       data: {
+//         quizzes: data
+//       }
+//     }
+//   }
+// }

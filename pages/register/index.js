@@ -31,7 +31,7 @@ function Register() {
       })
 
       // console.log(isValid)
-      const res = await fetch('/api/users/register', {
+      const res = await fetch('/api/users', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -48,10 +48,11 @@ function Register() {
         Cookies.set('user', JSON.stringify(data), { expires: 7 })
         router.push('/dashboard')
       } else {
-        setAllErrors({ api: data.message })
+        setAllErrors({ api: data.message || 'Registration failed' })
       }
 
     } catch (err) {
+      console.error('Registration error:', err)
       if (err.inner) {
         let errors = err.inner.reduce(
           (acc, err) => ({

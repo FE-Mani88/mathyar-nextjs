@@ -21,8 +21,8 @@ import {
     Key
 } from 'lucide-react';
 import Cookies from 'js-cookie';
-import fs from 'fs'
-import path from 'path';
+// import fs from 'fs'
+// import path from 'path';
 
 
 const NavItem = ({ icon: Icon, text, isActive, onClick }) => (
@@ -35,8 +35,8 @@ const NavItem = ({ icon: Icon, text, isActive, onClick }) => (
         className={`
       flex items-center gap-3 px-4 py-3 rounded-lg transition-colors
       ${isActive
-                ? 'bg-blue-600 text-white'
-                : 'text-gray-300 hover:bg-gray-800'
+                ? 'bg-blue-600 text-white transition-all duration-300'
+                : 'text-gray-300 hover:bg-gray-800 transition-all duration-300'
             }
     `}
     >
@@ -50,7 +50,7 @@ const Sidebar = ({ isOpen, onClose, activeItem, setActiveItem }) => (
         {/* Mobile overlay */}
         {isOpen && (
             <div
-                className="md:!hidden fixed inset-0 bg-black bg-opacity-50 z-20"
+                className="md:!hidden fixed inset-0 z-20 transition-all duration-300"
                 onClick={onClose}
             />
         )}
@@ -67,7 +67,7 @@ const Sidebar = ({ isOpen, onClose, activeItem, setActiveItem }) => (
                 <div className="flex items-center justify-between mb-8">
                     <div className="flex items-center gap-3">
                         <BarChart3 className="h-8 w-8 text-blue-500" />
-                        <span className="text-xl font-bold">User Dashboard</span>
+                        <span className="text-xl font-bold">Admin Dashboard</span>
                     </div>
                     <button
                         onClick={onClose}
@@ -122,41 +122,82 @@ const StatCard = ({ icon: Icon, title, value, trend }) => (
     </div>
 );
 
-const DashboardContent = ({ mainUser }) => (
-    <>
-        <div className="mb-6 md:mb-8">
-            <h1 className="text-xl md:text-2xl font-bold text-gray-800">Dashboard Overview</h1>
-            <p className="text-gray-600 mt-1">Welcome, {mainUser?.name}</p>
+const DashboardContent = ({ mainUser }) => {
+    const [users, setUsers] = useState(null)
+    const [quizzes, setQuizzes] = useState(null)
 
-        </div>
+    useEffect(() => {
+        const fetchUsers = async () => {
+            const res = await fetch('/api/users')
+            const data = await res.json()
+            if (users) {
+                return false
+            } else {
+                setUsers(data)
+            }
+            // console.log(data);
+        }
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-6 md:mb-8">
-            <StatCard icon={Users} title="Total Users" value="2,543" trend={12} />
-            <StatCard icon={Package} title="Total Products" value="1,678" trend={8} />
-            <StatCard icon={MessageSquare} title="Messages" value="832" trend={-3} />
-            <StatCard icon={BarChart3} title="Revenue" value="$45,678" trend={24} />
-        </div>
+        fetchUsers()
 
-        <div className="bg-white rounded-xl shadow-sm p-4 md:p-6">
-            <h2 className="text-lg font-semibold mb-4">Recent Activity</h2>
-            <div className="space-y-4">
-                {[1, 2, 3, 4, 5].map((_, index) => (
-                    <div key={index} className="flex items-center gap-3 md:gap-4 py-3 border-b last:border-0">
-                        <img
-                            src={`https://images.unsplash.com/photo-${1500000000000 + index}?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80`}
-                            alt="User"
-                            className="w-8 h-8 md:w-10 md:h-10 rounded-full"
-                        />
-                        <div>
-                            <p className="font-medium">User Activity {index + 1}</p>
-                            <p className="text-sm text-gray-500">2 hours ago</p>
-                        </div>
-                    </div>
-                ))}
+        const fetchQuizzes = async () => {
+            const res = await fetch('/api/quizzes')
+            const data = await res.json()
+            if (quizzes) {
+                return false
+            } else {
+                setQuizzes(data)
+            }
+        }
+
+        fetchQuizzes()
+    })
+
+    return (
+        <>
+            <div className="mb-6 md:mb-8">
+                <h1 className="text-xl md:text-2xl font-bold text-gray-800">Dashboard Overview</h1>
+                <p className="text-gray-600 mt-1">Welcome, {mainUser?.name}</p>
+
             </div>
-        </div>
-    </>
-);
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-6 md:mb-8">
+                <StatCard icon={Users} title="Total Users" value={users?.length} trend={12} />
+                <StatCard icon={Package} title="Total Quizzes" value={quizzes?.length} trend={8} />
+                <StatCard icon={MessageSquare} title="Messages" value="832" trend={-3} />
+                <StatCard icon={BarChart3} title="Revenue" value="$45,678" trend={24} />
+            </div>
+
+            <div className="bg-white rounded-xl shadow-sm p-4 md:p-6">
+                <h2 className="text-lg font-semibold mb-4">Our First Users</h2>
+                <div className="space-y-4">
+                    {users?.filter(user => user?.isAdmin === false).slice(0, 3).map((user, index) => (
+                        <div key={index} className="flex items-center gap-3 md:gap-4 py-3 border-b last:border-0 bg-gray-100 rounded-lg px-4">
+                            <div>
+                                <p className="font-medium">{user.name}</p>
+                                <p className="text-sm text-gray-500">Offline</p>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            <div className="bg-white rounded-xl shadow-sm p-4 md:p-6">
+                <h2 className="text-lg font-semibold mb-4">Our First Quizzes</h2>
+                <div className="space-y-4">
+                    {quizzes?.slice(0, 3).map((quiz, index) => (
+                        <div key={index} className="flex items-center gap-3 md:gap-4 py-3 border-b last:border-0 bg-gray-100 rounded-lg px-4">
+                            <div>
+                                <p className="font-medium">{quiz.title}</p>
+                                <p className="text-sm text-gray-500">Time: {quiz.duration} Minute(s)</p>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        </>
+    )
+};
 
 const UsersContent = ({ users }) => {
 
@@ -316,8 +357,6 @@ const ProductsContent = ({ quizzes }) => {
                 {!filteredQuizzes?.length ? <span className='flex mx-auto mt-4'>Quiz Not Found !</span> : null}
             </div>
         </>
-
-        // <div>Hi</div>
     )
 }
 
@@ -428,15 +467,17 @@ function App({ data }) {
 
         fetchUsers()
 
-        // const fetchHandler = async () => {
-        //     const res = await fetch('http://localhost:3000/api/quizzes')
-        //     const quizzesData = await res.json()
-        //     setQuizzes(quizzesData)
-        //     // console.log(quizzesData)
-        // }
+        const fetchQuizzes = async () => {
+            const res = await fetch('/api/quizzes')
+            const quizzesData = await res.json()
+            console.log('mongo ', quizzesData);
 
-        // fetchHandler()
-        console.log('App: ', data.quizzesData.quizzes);
+            setQuizzes(quizzesData)
+        }
+
+        fetchQuizzes()
+
+        // console.log('App: ', data.quizzesData.quizzes);
 
         const getfromCookie = () => {
             const pureData = Cookies.get('user')
@@ -456,7 +497,7 @@ function App({ data }) {
             case 'users':
                 return <UsersContent users={users} />;
             case 'products':
-                return <ProductsContent quizzes={data.quizzesData.quizzes} />;
+                return <ProductsContent quizzes={quizzes} />;
             case 'messages':
                 return <MessagesContent />;
             case 'settings':
@@ -490,9 +531,9 @@ function App({ data }) {
                             <div className="flex items-center gap-4 ml-auto">
                                 {/* Search - Full width on mobile when active */}
                                 <div className={`
-                    ${isSearchOpen ? 'absolute inset-x-0 p-4 bg-white' : 'relative'} 
-                    md:relative md:p-0
-                  `}>
+                                    ${isSearchOpen ? 'absolute inset-x-0 p-4 bg-white' : 'relative'} 
+                                                    md:relative md:p-0
+                                `}>
                                     {isSearchOpen && (
                                         <button
                                             className="absolute right-5 top-5 md:hidden"
@@ -542,19 +583,19 @@ function App({ data }) {
 export default App;
 
 
-export async function getServerSideProps(params) {
-    const databaseDirectory = path.join(process.cwd(), 'data', 'db.json')
-    const bufferData = fs.readFileSync(databaseDirectory)
-    const data = JSON.parse(bufferData)
+// export async function getServerSideProps(params) {
+//     const databaseDirectory = path.join(process.cwd(), 'data', 'db.json')
+//     const bufferData = fs.readFileSync(databaseDirectory)
+//     const data = JSON.parse(bufferData)
 
-    console.log('//////////////////', data.quizzes);
+//     console.log('//////////////////', data.quizzes);
 
 
-    return {
-        props: {
-            data: {
-                quizzesData: data
-            }
-        }
-    }
-}
+//     return {
+//         props: {
+//             data: {
+//                 quizzesData: data
+//             }
+//         }
+//     }
+// }
