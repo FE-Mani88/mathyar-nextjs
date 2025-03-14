@@ -122,6 +122,32 @@ const StatCard = ({ icon: Icon, title, value, trend }) => (
     </div>
 );
 
+const SuccessModal = ({ isOpen, message, onClose }) => {
+    if (!isOpen) return null;
+
+    return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+            <div className="absolute inset-0 bg-black opacity-50" onClick={onClose}></div>
+            <div className="relative bg-white rounded-lg p-6 max-w-sm w-full mx-4 shadow-xl">
+                <div className="flex items-center justify-center mb-4">
+                    <div className="bg-green-100 rounded-full p-3">
+                        <svg className="h-6 w-6 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
+                    </div>
+                </div>
+                <p className="text-center text-gray-700 mb-4">{message}</p>
+                <button
+                    onClick={onClose}
+                    className="w-full bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600 transition-colors"
+                >
+                    تایید
+                </button>
+            </div>
+        </div>
+    );
+};
+
 const DashboardContent = ({ mainUser }) => {
     const [users, setUsers] = useState(null)
     const [quizzes, setQuizzes] = useState(null)
@@ -199,20 +225,51 @@ const DashboardContent = ({ mainUser }) => {
     )
 };
 
-const UsersContent = ({ users }) => {
-
+const UsersContent = ({ users: initialUsers }) => {
     const [searchQuery, setSearchQuery] = useState('')
+    const [users, setUsers] = useState(initialUsers)
+    const [showModal, setShowModal] = useState(false)
 
     const filteredUsers = users.filter(user => {
         return user.name.toLowerCase().includes(searchQuery.toLowerCase())
     })
 
+    const deleteUser = async (id) => {
+        try {
+            const res = await fetch(`/api/users/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ id })
+            })
+            
+            if (res.ok) {
+                // Update local state immediately after successful deletion
+                setUsers(prevUsers => prevUsers.filter(user => user._id !== id))
+                // Show success modal
+                setShowModal(true)
+            } else {
+                console.error('Failed to delete user')
+            }
+        } catch (error) {
+            console.error('Error deleting user:', error)
+        }
+    }
+
     return (
         <>
             <div className="mb-6 md:mb-8">
                 <h1 className="text-xl md:text-2xl font-bold text-gray-800">User Management</h1>
-                <p className="text-gray-600 mt-1">Manage your user base</p>
+                <p className="text-gray-600 mt-1">Manage your users bases</p>
             </div>
+
+            {/* Success Modal */}
+            <SuccessModal
+                isOpen={showModal}
+                message="کاربر با موفقیت حذف شد"
+                onClose={() => setShowModal(false)}
+            />
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-6 md:mb-8">
                 <StatCard icon={UserPlus} title="New Users" value="156" trend={8} />
@@ -284,6 +341,10 @@ const UsersContent = ({ users }) => {
                                             </div>
                                         </div>
                                     </td>
+                                    {!user?.isAdmin ?
+                                        <button className='!px-2 !py-1 !bg-red-500 !text-white !rounded-md hover:!bg-red-700 !transition-all !duration-300' onClick={() => deleteUser(user?._id)}>حذف</button>
+                                        : null
+                                    }
                                 </tr>
                             ))}
                         </tbody>
