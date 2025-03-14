@@ -27,45 +27,41 @@ function Register() {
 
     try {
       const isValid = await registerValidator.validate(newUser, {
-        abortEarly: false
+          abortEarly: false
       })
 
-      // console.log(isValid)
       const res = await fetch('/api/users', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(newUser)
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            name: event.target[0].value,
+            email: event.target[1].value,
+            password: event.target[2].value
+          })
       })
 
       const data = await res.json()
+      console.log(data);
+
 
       if (res.ok) {
-        event.target[0].value = ''
-        event.target[1].value = ''
-        event.target[2].value = ''
-        Cookies.set('user', JSON.stringify(data), { expires: 7 })
-        router.push('/dashboard')
-      } else {
-        setAllErrors({ api: data.message || 'Registration failed' })
+          Cookies.set('user', JSON.stringify(data), { expires: 7 })
+          router.push('/dashboard')
       }
 
-    } catch (err) {
-      console.error('Registration error:', err)
-      if (err.inner) {
-        let errors = err.inner.reduce(
+  } catch (err) {
+      let errors = err?.inner?.reduce(
           (acc, err) => ({
-            ...acc,
-            [err.path]: err.message,
+              ...acc,
+              [err.path]: err.message,
           }),
           {}
-        );
-        setAllErrors(errors);
-      } else {
-        setAllErrors({ api: 'An error occurred during registration' });
-      }
-    }
+      );
+      setAllErrors(errors);
+      // console.log(validateErrors);
+  }
 
   }
 
