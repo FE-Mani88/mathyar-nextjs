@@ -1,13 +1,11 @@
-import fs from 'fs'
-import path from 'path'
+import Question from '@/models/question'
 
-export default function Questions(req, res) {
-    const databaseDirectory = path.join(process.cwd(), 'data', 'db.json')
-
-    const bufferData = fs.readFileSync(databaseDirectory)
-    const data = JSON.parse(bufferData)
+export default async function Questions(req, res) {
+    
 
     if (req.method === 'GET') {
-        res.json(data.questions)
+        // res.json(data.questions)
+        const questions = await Question.find()
+        res.json(questions)
     }
 }

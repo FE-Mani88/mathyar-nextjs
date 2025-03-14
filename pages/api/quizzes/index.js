@@ -9,5 +9,9 @@ export default async function Quizzes(req, res) {
         const quizzes = await quizzesModel.find()
         
         res.json(quizzes)
+    } else if (req.method === 'POST') {
+        const { title, imageUrl, description, difficulty, grade, duration, topics } = req.body
+        const quiz = await quizzesModel.create({ title, imageUrl, description, difficulty, grade, duration, topics })
+        res.json(quiz)
     }
 }

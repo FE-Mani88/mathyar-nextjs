@@ -1,10 +1,6 @@
 import mongoose from "mongoose";
 
 const quizSchema = mongoose.Schema({
-    id: {
-        type: String,
-        required: true
-    },
     grade: {
         type: Number,
         required: true,
@@ -23,6 +19,10 @@ const quizSchema = mongoose.Schema({
     },
     duration: {
         type: Number,
+        required: true,
+    },
+    topics: {
+        type: [String],
         required: true,
     }
 })

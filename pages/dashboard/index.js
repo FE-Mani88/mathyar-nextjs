@@ -84,7 +84,7 @@ const Sidebar = ({ isOpen, onClose, activeItem, setActiveItem }) => (
                             { icon: Users, text: 'Users', id: 'users' },
                             { icon: Package, text: 'Quizzes', id: 'products' },
                             { icon: MessageSquare, text: 'Messages', id: 'messages' },
-                            { icon: Settings, text: 'Settings', id: 'settings' },
+                            { icon: Settings, text: 'Add Quiz', id: 'settings' },
                         ].map((item) => (
                             <li key={item.id}>
                                 <NavItem
@@ -139,10 +139,47 @@ const SuccessModal = ({ isOpen, message, onClose }) => {
                 <p className="text-center text-gray-700 mb-4">{message}</p>
                 <button
                     onClick={onClose}
-                    className="w-full bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600 transition-colors"
+                    className="w-full !mt-2 !bg-green-500 !text-white !py-2 !px-4 !rounded-lg hover:!bg-green-600 !transition-colors"
                 >
                     تایید
                 </button>
+            </div>
+        </div>
+    );
+};
+
+const ConfirmModal = ({ isOpen, onClose, onConfirm, userName }) => {
+    if (!isOpen) return null;
+
+    return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+            <div className="absolute inset-0 bg-black opacity-50" onClick={onClose}></div>
+            <div className="relative bg-white rounded-lg p-6 max-w-sm w-full mx-4 shadow-xl">
+                <div className="flex items-center justify-center mb-4">
+                    <div className="bg-red-100 rounded-full p-3">
+                        <svg className="h-6 w-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
+                    </div>
+                </div>
+                <h3 className="text-lg font-medium text-gray-900 text-center mb-2">حذف کاربر</h3>
+                <p className="text-center text-gray-500 mb-4 rtl">
+                    آیا از حذف کاربر <span className="font-bold text-gray-700">{userName}</span> مطمئن هستید؟
+                </p>
+                <div className="flex gap-3 mt-6">
+                    <button
+                        onClick={onConfirm}
+                        className="flex-1 !bg-red-500 !text-white !py-2 !px-4 !rounded-lg hover:!bg-red-600 !transition-colors"
+                    >
+                        بله، حذف شود
+                    </button>
+                    <button
+                        onClick={onClose}
+                        className="flex-1 !bg-gray-200 !text-gray-800 !py-2 !px-4 !rounded-lg hover:!bg-gray-300 !transition-colors"
+                    >
+                        انصراف
+                    </button>
+                </div>
             </div>
         </div>
     );
@@ -228,32 +265,45 @@ const DashboardContent = ({ mainUser }) => {
 const UsersContent = ({ users: initialUsers }) => {
     const [searchQuery, setSearchQuery] = useState('')
     const [users, setUsers] = useState(initialUsers)
-    const [showModal, setShowModal] = useState(false)
+    const [showSuccessModal, setShowSuccessModal] = useState(false)
+    const [showConfirmModal, setShowConfirmModal] = useState(false)
+    const [userToDelete, setUserToDelete] = useState(null)
 
     const filteredUsers = users.filter(user => {
         return user.name.toLowerCase().includes(searchQuery.toLowerCase())
     })
 
-    const deleteUser = async (id) => {
+    const handleDeleteClick = (user) => {
+        setUserToDelete(user)
+        setShowConfirmModal(true)
+    }
+
+    const handleConfirmDelete = async () => {
+        if (!userToDelete) return
+
         try {
-            const res = await fetch(`/api/users/${id}`, {
+            const res = await fetch(`/api/users/${userToDelete._id}`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ id })
+                body: JSON.stringify({ id: userToDelete._id })
             })
-            
+
             if (res.ok) {
                 // Update local state immediately after successful deletion
-                setUsers(prevUsers => prevUsers.filter(user => user._id !== id))
+                setUsers(prevUsers => prevUsers.filter(user => user._id !== userToDelete._id))
                 // Show success modal
-                setShowModal(true)
+                setShowSuccessModal(true)
             } else {
                 console.error('Failed to delete user')
             }
         } catch (error) {
             console.error('Error deleting user:', error)
+        } finally {
+            // Close confirm modal and clear userToDelete
+            setShowConfirmModal(false)
+            setUserToDelete(null)
         }
     }
 
@@ -266,9 +316,20 @@ const UsersContent = ({ users: initialUsers }) => {
 
             {/* Success Modal */}
             <SuccessModal
-                isOpen={showModal}
+                isOpen={showSuccessModal}
                 message="کاربر با موفقیت حذف شد"
-                onClose={() => setShowModal(false)}
+                onClose={() => setShowSuccessModal(false)}
+            />
+
+            {/* Confirm Modal */}
+            <ConfirmModal
+                isOpen={showConfirmModal}
+                onClose={() => {
+                    setShowConfirmModal(false)
+                    setUserToDelete(null)
+                }}
+                onConfirm={handleConfirmDelete}
+                userName={userToDelete?.name}
             />
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-6 md:mb-8">
@@ -341,10 +402,14 @@ const UsersContent = ({ users: initialUsers }) => {
                                             </div>
                                         </div>
                                     </td>
-                                    {!user?.isAdmin ?
-                                        <button className='!px-2 !py-1 !bg-red-500 !text-white !rounded-md hover:!bg-red-700 !transition-all !duration-300' onClick={() => deleteUser(user?._id)}>حذف</button>
-                                        : null
-                                    }
+                                    {!user?.isAdmin && (
+                                        <button
+                                            className='!px-2 !py-1 !bg-red-500 !text-white !rounded-md hover:!bg-red-700 !transition-all !duration-300'
+                                            onClick={() => handleDeleteClick(user)}
+                                        >
+                                            حذف
+                                        </button>
+                                    )}
                                 </tr>
                             ))}
                         </tbody>
@@ -458,57 +523,450 @@ const MessagesContent = () => (
     </>
 );
 
-const SettingsContent = () => (
-    <>
-        <div className="mb-6 md:mb-8">
-            <h1 className="text-xl md:text-2xl font-bold text-gray-800">Settings</h1>
-            <p className="text-gray-600 mt-1">Manage your preferences</p>
-        </div>
+const SettingsContent = () => {
+    const handleCreateQuiz = async (e) => {
+        e.preventDefault();
+        
+        const addNewQuiz = {
+            id: e.target.id.value || undefined,
+            title: e.target.title.value,
+            imageUrl: e.target.imageUrl.value,
+            description: e.target.description.value,
+            difficulty: e.target.difficulty.value,
+            grade: e.target.grade.value,
+            duration: e.target.duration.value,
+            topics: [
+                e.target.topic1.value,
+                e.target.topic2.value,
+                e.target.topic3.value
+            ]
+        }
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-6 md:mb-8">
-            <StatCard icon={Shield} title="Security Level" value="High" trend={0} />
-            <StatCard icon={Key} title="API Keys" value="12" trend={20} />
-            <StatCard icon={Users} title="Team Members" value="8" trend={0} />
-        </div>
+        const res = await fetch('/api/quizzes', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(addNewQuiz)
+        })
 
-        <div className="bg-white rounded-xl shadow-sm p-4 md:p-6">
-            <h2 className="text-lg font-semibold mb-4">General Settings</h2>
-            <div className="space-y-6">
-                <div>
-                    <label className="block text-sm font-medium text-gray-700">Site Name</label>
-                    <input
-                        type="text"
-                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                        defaultValue="AdminHub"
-                    />
+        // console.log(await res.json());
+        
+        
+        console.log('New Quiz Data:', addNewQuiz);
+    };
+
+    return (
+        <>
+            <div className="mb-6 md:mb-8">
+                <h1 className="text-xl md:text-2xl font-bold text-gray-800">Add Quiz</h1>
+                <p className="text-gray-600 mt-1">Create a new quiz</p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-6 md:mb-8">
+                <StatCard icon={Shield} title="Total Quizzes" value="25" trend={10} />
+                <StatCard icon={Key} title="Active Quizzes" value="18" trend={5} />
+                <StatCard icon={Users} title="Quiz Participants" value="156" trend={15} />
+            </div>
+
+            <form onSubmit={handleCreateQuiz} className="space-y-8">
+                {/* Quiz General Information */}
+                <div className="bg-white rounded-xl shadow-sm p-6">
+                    <h2 className="text-lg font-semibold mb-4 text-gray-800">Quiz Information</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">Quiz ID</label>
+                            <input
+                                type="text"
+                                name="id"
+                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                placeholder="Enter Quiz ID"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">Quiz Title</label>
+                            <input
+                                type="text"
+                                name="title"
+                                // required
+                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                placeholder="Enter quiz title..."
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">Quiz Image URL</label>
+                            <input
+                                type="url"
+                                name="imageUrl"
+                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                placeholder="Enter image URL..."
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">Quiz Description</label>
+                            <input
+                                type="text"
+                                name="description"
+                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                placeholder="Enter Quiz Description..."
+                            />
+                        </div>
+
+                        {/* Topics Section */}
+                        <div className="col-span-1 md:col-span-2">
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Topics</label>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div>
+                                    <input
+                                        type="text"
+                                        name="topic1"
+                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                        placeholder="First Topic"
+                                    />
+                                </div>
+                                <div>
+                                    <input
+                                        type="text"
+                                        name="topic2"
+                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                        placeholder="Second Topic"
+                                    />
+                                </div>
+                                <div>
+                                    <input
+                                        type="text"
+                                        name="topic3"
+                                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                        placeholder="Third Topic"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">Difficulty Level</label>
+                            <select
+                                name="difficulty"
+                                required
+                                defaultValue=""
+                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                            >
+                                <option value="" disabled>Select difficulty</option>
+                                <option value="easy">Easy</option>
+                                <option value="medium">Medium</option>
+                                <option value="hard">Hard</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">Grade</label>
+                            <select
+                                name="grade"
+                                required
+                                defaultValue=""
+                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                            >
+                                <option value="" disabled>Select grade</option>
+                                <option value="7">Seventh Grade</option>
+                                <option value="8">Eighth Grade</option>
+                                <option value="9">Ninth Grade</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700">Duration (minutes)</label>
+                            <input
+                                type="number"
+                                name="duration"
+                                // required
+                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                placeholder="Enter duration..."
+                                min="1"
+                            />
+                        </div>
+                    </div>
                 </div>
-                <div>
-                    <label className="block text-sm font-medium text-gray-700">Contact Email</label>
-                    <input
-                        type="email"
-                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                        defaultValue="admin@example.com"
-                    />
+
+                {/* Questions Section */}
+                <div className="bg-white rounded-xl shadow-sm p-6">
+                    <h2 className="text-lg font-semibold mb-4 text-gray-800">First Question</h2>
+                    <div className="space-y-6">
+                        <div className="border-b pb-4">
+                            <label className="block text-lg font-medium text-gray-800 mb-2">Question</label>
+                            <textarea
+                                name="question1"
+                                // required
+                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 min-h-[100px]"
+                                placeholder="Enter your question here..."
+                            />
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">Option 1</label>
+                                <input
+                                    type="text"
+                                    name="q1option1"
+                                    // required
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">Option 2</label>
+                                <input
+                                    type="text"
+                                    name="q1option2"
+                                    //  required
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">Option 3</label>
+                                <input
+                                    type="text"
+                                    name="q1option3"
+                                    // required
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">Option 4</label>
+                                <input
+                                    type="text"
+                                    name="q1option4"
+                                    // required
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                />
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div>
-                    <label className="block text-sm font-medium text-gray-700">Timezone</label>
-                    <select
-                        className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+
+                {/* Second Question */}
+                <div className="bg-white rounded-xl shadow-sm p-6">
+                    <h2 className="text-lg font-semibold mb-4 text-gray-800">Second Question</h2>
+                    <div className="space-y-6">
+                        <div className="border-b pb-4">
+                            <label className="block text-lg font-medium text-gray-800 mb-2">Question</label>
+                            <textarea
+                                name="question2"
+                                // required
+                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 min-h-[100px]"
+                                placeholder="Enter your question here..."
+                            />
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">Option 1</label>
+                                <input
+                                    type="text"
+                                    name="q2option1"
+                                    //required
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">Option 2</label>
+                                <input
+                                    type="text"
+                                    name="q2option2"
+                                    //  required
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">Option 3</label>
+                                <input
+                                    type="text"
+                                    name="q2option3"
+                                    // required
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">Option 4</label>
+                                <input
+                                    type="text"
+                                    name="q2option4"
+                                    // required
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Third Question */}
+                <div className="bg-white rounded-xl shadow-sm p-6">
+                    <h2 className="text-lg font-semibold mb-4 text-gray-800">Third Question</h2>
+                    <div className="space-y-6">
+                        <div className="border-b pb-4">
+                            <label className="block text-lg font-medium text-gray-800 mb-2">Question</label>
+                            <textarea
+                                name="question3"
+                                // required
+                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 min-h-[100px]"
+                                placeholder="Enter your question here..."
+                            />
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">Option 1</label>
+                                <input
+                                    type="text"
+                                    name="q3option1"
+                                    //  required
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">Option 2</label>
+                                <input
+                                    type="text"
+                                    name="q3option2"
+                                    //      required
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">Option 3</label>
+                                <input
+                                    type="text"
+                                    name="q3option3"
+                                    // required
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">Option 4</label>
+                                <input
+                                    type="text"
+                                    name="q3option4"
+                                    // required
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Fourth Question */}
+                <div className="bg-white rounded-xl shadow-sm p-6">
+                    <h2 className="text-lg font-semibold mb-4 text-gray-800">Fourth Question</h2>
+                    <div className="space-y-6">
+                        <div className="border-b pb-4">
+                            <label className="block text-lg font-medium text-gray-800 mb-2">Question</label>
+                            <textarea
+                                name="question4"
+                                // required
+                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 min-h-[100px]"
+                                placeholder="Enter your question here..."
+                            />
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">Option 1</label>
+                                <input
+                                    type="text"
+                                    name="q4option1"
+                                    //required
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">Option 2</label>
+                                <input
+                                    type="text"
+                                    name="q4option2"
+                                    // required
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">Option 3</label>
+                                <input
+                                    type="text"
+                                    name="q4option3"
+                                    // required
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">Option 4</label>
+                                <input
+                                    type="text"
+                                    name="q4option4"
+                                    // required
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Fifth Question */}
+                <div className="bg-white rounded-xl shadow-sm p-6">
+                    <h2 className="text-lg font-semibold mb-4 text-gray-800">Fifth Question</h2>
+                    <div className="space-y-6">
+                        <div className="border-b pb-4">
+                            <label className="block text-lg font-medium text-gray-800 mb-2">Question</label>
+                            <textarea
+                                name="question5"
+                                // required
+                                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 min-h-[100px]"
+                                placeholder="Enter your question here..."
+                            />
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">Option 1</label>
+                                <input
+                                    type="text"
+                                    name="q5option1"
+                                    // required
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">Option 2</label>
+                                <input
+                                    type="text"
+                                    name="q5option2"
+                                    // required
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">Option 3</label>
+                                <input
+                                    type="text"
+                                    name="q5option3"
+                                    // required
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700">Option 4</label>
+                                <input
+                                    type="text"
+                                    name="q5option4"
+                                    // required
+                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="flex justify-end mt-6">
+                    <button
+                        type="submit"
+                        className="!flex !justify-center !text-center !mx-auto !bg-blue-600 !text-white !px-8 !py-2 !rounded-lg hover:!bg-blue-700 transition-colors"
                     >
-                        <option>UTC</option>
-                        <option>EST</option>
-                        <option>PST</option>
-                    </select>
-                </div>
-                <div className="flex items-center justify-end">
-                    <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
-                        Save Changes
+                        ساخت آزمون
                     </button>
                 </div>
-            </div>
-        </div>
-    </>
-);
+            </form>
+        </>
+    );
+};
 
 function App({ data }) {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);

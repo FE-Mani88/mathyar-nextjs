@@ -10,11 +10,32 @@ export function ActiveQuiz({ quiz }) {
   const [answers, setAnswers] = useState([]);
   const [timeLeft, setTimeLeft] = useState(quiz.duration * 60);
   const [isFinished, setIsFinished] = useState(false);
-
+  const [quizQuestionst, setQuizQuestionst] = useState([])
   const router = useRouter()
 
   const quizQuestions = questions[router.query.shortname] || [];
+  const [quizQuestionsState, setQuizQuestionsState] = useState([])
 
+  console.log('js file => ', questions);
+
+  useEffect(() => {
+    const fetchQuestions = async () => {
+      const res = await fetch('/api/questions')
+      const data = await res.json()
+      data.forEach(quiz => {
+        if (quiz.id == router.query.shortname) {
+          // setQuizQuestionst(quiz)
+          setQuizQuestionsState(quiz)
+        }
+      })
+      
+      console.log('quiz => ', quizQuestionsState);
+      console.log('quizQuestions => ', quizQuestions);
+    }
+
+    fetchQuestions()
+  }, [])
+  
 
   useEffect(() => {
     if (timeLeft > 0 && !isFinished) {
