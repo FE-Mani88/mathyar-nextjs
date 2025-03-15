@@ -10,7 +10,7 @@ export function ActiveQuiz({ quiz }) {
   const [answers, setAnswers] = useState([]);
   const [timeLeft, setTimeLeft] = useState(quiz.duration * 60);
   const [isFinished, setIsFinished] = useState(false);
-  const [quizQuestionst, setQuizQuestionst] = useState([])
+  // const [quizQuestionst, setQuizQuestionst] = useState([])
   const router = useRouter()
 
   const quizQuestions = questions[router.query.shortname] || [];
@@ -25,17 +25,21 @@ export function ActiveQuiz({ quiz }) {
       data.forEach(quiz => {
         if (quiz.id == router.query.shortname) {
           // setQuizQuestionst(quiz)
-          setQuizQuestionsState(quiz)
+          if (quizQuestionsState.length) {
+            // setQuizQuestionsState(quiz)
+            return false
+          } else {
+            setQuizQuestionsState((prev) => [...prev, quiz])
+          }
         }
       })
-      
-      console.log('quiz => ', quizQuestionsState);
-      console.log('quizQuestions => ', quizQuestions);
     }
-
+    
     fetchQuestions()
+    // console.log('quizQuestions => ', quizQuestions);
   }, [])
   
+  console.log('quiz => ', quizQuestionsState);
 
   useEffect(() => {
     if (timeLeft > 0 && !isFinished) {
@@ -101,7 +105,7 @@ export function ActiveQuiz({ quiz }) {
         />
 
         <QuizQuestion
-          question={quizQuestions[currentQuestion]}
+          question={quizQuestionsState[currentQuestion]}
           selectedAnswer={answers[currentQuestion]}
           onAnswerSelect={handleAnswerSelect}
         />

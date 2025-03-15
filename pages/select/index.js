@@ -28,7 +28,7 @@ export default function Select(props) {
 
   useEffect(() => {
     const fetchHandler = async () => {
-      const res = await fetch('http://localhost:3000/api/quizzes')
+      const res = await fetch('/api/quizzes')
       const quizzesData = await res.json()
       setQuizzes(quizzesData)
     }
